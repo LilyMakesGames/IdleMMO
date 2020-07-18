@@ -26,4 +26,6 @@ public abstract class Controller : MonoBehaviour
 
     protected abstract void DoSkill(BaseSkill skill);
     protected abstract List<ITargetable> FindTarget(BaseSkill skill);
+
+    public abstract void SetTarget(Entity target);
 }

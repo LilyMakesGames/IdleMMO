@@ -5,40 +5,30 @@ using UnityEngine.UIElements;
 
 public abstract class Entity : MonoBehaviour, ITargetable
 {
-    public EntityStats entityStats;
+    public EntityBaseStats entityBaseStats;
+    public EntityData entityStats;
     SpriteRenderer spriteRenderer;
     BoxCollider2D spriteCollider;
-    #region
-    //public float MaxHealth { get; set; }
-    //public Resource Resource { get; set; }
-    //public float Strength { get; set; }
-    //public float Agility { get; set; }
-    //public float Intelligence { get; set; }
-
-    //public float AttackSpeed { get; set; } = 1;
-
-    //float baseMaxHP;
-    //float currentHP;
-    //float baseStrength, baseAgility, baseIntelligence;
-    //float regenHP;
-
-    //public float attackStat;
-    //float armorStat;
-    //public float magicAttackStat;
-    //float magicResistance;
-
-    //protected int teamID;
-
+    
     protected List<BaseSkill> skills = new List<BaseSkill>();
-    #endregion
+
+    List<Object> onReceiveDamage;
+    List<Object> onReceiveHeal;
+    List<Object> onHeal;
+
+    List<Object> onUseSkill;
+    List<Object> onReceiveStatusEffect;
+
 
     public virtual void Start()
     {
+        entityStats = new EntityData();
+        entityStats.Initialize(entityBaseStats);
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteCollider = GetComponent<BoxCollider2D>();
-        if(entityStats.sprite != null)
+        if(entityBaseStats.sprite != null)
         {
-            spriteRenderer.sprite = entityStats.sprite;
+            spriteRenderer.sprite = entityBaseStats.sprite;
             spriteCollider.size = spriteRenderer.sprite.bounds.size;
         }
         
@@ -66,6 +56,10 @@ public abstract class Entity : MonoBehaviour, ITargetable
                 entityStats.currentHP -= (damage * (100 / (100 + entityStats.magicResistance)));
                 break;
         }
+        if(entityStats.currentHP <= 0)
+        {
+            OnDeath();
+        }
     }
 
     public virtual void ReceiveHeal(float healValue)
@@ -73,11 +67,13 @@ public abstract class Entity : MonoBehaviour, ITargetable
         entityStats.currentHP += healValue;
     }
 
+    
+
     protected void UpdateSprite()
     {
-        if (entityStats.sprite != null)
+        if (entityBaseStats.sprite != null)
         {
-            spriteRenderer.sprite = entityStats.sprite;
+            spriteRenderer.sprite = entityBaseStats.sprite;
             spriteCollider.size = spriteRenderer.sprite.bounds.size;
         }
     }
@@ -85,5 +81,9 @@ public abstract class Entity : MonoBehaviour, ITargetable
     private void OnMouseDown()
     {
         CombatManager.instance.PlayerSelectTarget(this);
+    }
+
+    public virtual void OnDeath()
+    {
     }
 }

@@ -9,7 +9,9 @@ public class CombatManager : MonoBehaviour
 
     public static CombatManager instance;
     public List<Enemy> enemiesOnScreen;
-    public PlayerController playerController;
+    public Controller playerController;
+    public PlayerCharacter playerCharacter;
+
 
     List<List<Entity>> teams;
 
@@ -36,16 +38,26 @@ public class CombatManager : MonoBehaviour
 
     }
 
+    public void SpawnEnemy(Enemy enemy)
+    {
+        enemy.SetEnemy(currentMap.enemiesOnMap[Random.Range(0, currentMap.enemiesOnMap.Count)]);
+    }
+
     void FillEnemies()
     {
         foreach (var enemy in enemiesOnScreen)
         {
-            enemy.SetEnemy(currentMap.enemiesOnMap[Random.Range(0, currentMap.enemiesOnMap.Count)]);
+            SpawnEnemy(enemy);
         }
     }
 
     public void PlayerSelectTarget(Entity target)
     {
         playerController.SetTarget(target);
+    }
+
+    public void PlayerCharacterEarnEXP(float exp)
+    {
+        playerCharacter.EarnEXP(exp);
     }
 }

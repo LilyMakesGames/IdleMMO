@@ -12,5 +12,5 @@ public class Map : ScriptableObject
         Dungeon
     }
 
-    public List<EntityStats> enemiesOnMap;
+    public List<EntityBaseStats> enemiesOnMap;
 }

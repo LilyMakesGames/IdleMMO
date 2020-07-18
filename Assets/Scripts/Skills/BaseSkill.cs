@@ -14,6 +14,7 @@ public abstract class BaseSkill : ScriptableObject
         Global
     }
 
+    public int ID;
     public float resourceCost;
     public float cooldown;
     public float castTime;

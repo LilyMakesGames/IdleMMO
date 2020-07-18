@@ -8,7 +8,7 @@ public class UnarmedAttack : BaseSkill
 
     protected override float GetBaseStatFromUser(Entity user)
     {
-        return user.entityStats.attackStat;
+        return user.entityBaseStats.attackStat;
     }
 
     protected override void OnCast()

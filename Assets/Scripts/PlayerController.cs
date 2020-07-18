@@ -16,13 +16,13 @@ public class PlayerController : Controller
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            DoSkill(owner.entityStats.skills[0]);
+            DoSkill(owner.entityBaseStats.skills[0]);
         }
     }
 
-    public void SetTarget(Entity target)
+    public override void SetTarget(Entity target)
     {
-        if(target.entityStats.teamID == owner.entityStats.teamID)
+        if(target.entityBaseStats.teamID == owner.entityBaseStats.teamID)
         {
             currentTargetAlly = target;
         }

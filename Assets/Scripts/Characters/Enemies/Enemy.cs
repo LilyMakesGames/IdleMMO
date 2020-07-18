@@ -9,7 +9,7 @@ public class Enemy : Entity
     {
         base.Start();
         CombatManager.instance.enemiesOnScreen.Add(this);
-        entityStats.teamID = 1;
+        entityBaseStats.teamID = 1;
     }
 
     // Update is called once per frame
@@ -18,10 +18,16 @@ public class Enemy : Entity
         
     }
 
-    public void SetEnemy(EntityStats enemyStats)
+    public override void OnDeath()
     {
-        entityStats = enemyStats;
-        enemyStats.Initialize();
+        CombatManager.instance.PlayerCharacterEarnEXP(entityStats.xpOnDeath);
+        CombatManager.instance.SpawnEnemy(this);
+    }
+
+    public void SetEnemy(EntityBaseStats enemyBaseStats)
+    {
+        entityBaseStats = enemyBaseStats;
+        entityStats.Initialize(enemyBaseStats);
         UpdateSprite();
     }
 }
