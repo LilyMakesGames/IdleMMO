@@ -4,28 +4,44 @@ using UnityEngine;
 
 public abstract class Controller : MonoBehaviour
 {
-
-    protected Entity owner;
+    protected CombatEntity entity;
     protected List<BaseSkill> skills;
 
-    public ITargetable currentTargetEnemy, currentTargetAlly;
+    public CombatEntity currentTargetEnemy, currentTargetAlly;
 
+    private void Awake()
+    {
+        AwakeInit();
+    }
 
+    protected virtual void AwakeInit()
+    {
+        entity = GetComponent<CombatEntity>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        skills = owner.GetSkills();
+        StartInit();
+    }
+
+    protected virtual void StartInit()
+    {
+        skills = entity.GetSkills();
     }
 
     // Update is called once per frame
-    void Update()
+    public virtual void Tick(float deltaTime)
     {
-        
+        if (entity != null)
+        {
+            entity.Tick(deltaTime);
+        }
     }
 
-    protected abstract void DoSkill(BaseSkill skill);
-    protected abstract List<ITargetable> FindTarget(BaseSkill skill);
+    protected abstract void CastSkill(BaseSkill skill);
+    protected abstract List<CombatEntity> FindTarget(BaseSkill skill);
 
-    public abstract void SetTarget(Entity target);
+    public abstract void SetTarget(CombatEntity target);
+
 }

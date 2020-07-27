@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseSkill : ScriptableObject
+public class BaseSkill : ScriptableObject
 {
     public enum Target
     {
@@ -14,25 +15,73 @@ public abstract class BaseSkill : ScriptableObject
         Global
     }
 
+    public enum Effect
+    {
+        Damage,
+        Heal,
+        Status_Effect,
+
+    }
+
     public int ID;
+    public string skillName;
+    public Sprite sprite;
     public float resourceCost;
+    public float resourceGain;
     public float cooldown;
+    float timeToNextCast;
+    public float timerCast;
     public float castTime;
+    public float effectMultiplier;
     public Target targetType;
-    public ITargetable target;
-    public Entity user;
+    public List<CombatEntity> target;
+    public CombatEntity user;
     public DamageType damageType;
 
-    protected abstract float GetBaseStatFromUser(Entity user);
+    protected virtual float GetBaseStatFromUser(CombatEntity user)
+    {
+        return -1;
+    }
 
-    public abstract void Cast(Entity user, List<ITargetable> target);
+    public virtual void OnCast(CombatEntity user, List<CombatEntity> target)
+    {
+        if(Time.time > timeToNextCast)
+        {
+            timerCast = castTime;
+            this.user = user;
+            this.target = target;
+            user.StartCastSkill(this);
+            Debug.Log($"{user} is casting {this.skillName}");
+        }
+        else
+        {
+            Debug.Log($"{this.skillName} is on cooldown");
+        }
+    }
 
-    protected abstract void OnCast();
+    protected virtual void WhileCasting()
+    {
 
-    protected abstract void WhileCasting();
+    }
 
-    protected abstract void EndCast();
+    protected virtual void EndCast()
+    {
+        timeToNextCast = Time.time + cooldown;
+        DoSkill();
+        user.EndCastSkill();
+    }
 
-    protected abstract void DoSkill();
+    protected virtual void DoSkill()
+    {
 
+    }
+
+    public virtual void Tick(float deltaTime)
+    {
+        timerCast -= deltaTime;
+        if (timerCast <= 0)
+        {
+            EndCast();
+        }
+    }
 }

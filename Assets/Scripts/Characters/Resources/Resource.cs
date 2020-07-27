@@ -9,7 +9,6 @@ public class Resource : ScriptableObject
     public float currentValue;
     public float regenResource;
 
-
     public void AddResource(float value)
     {
         currentValue += value;

@@ -2,44 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "aaa", menuName = "Unarmed Attack")]
 public class UnarmedAttack : BaseSkill
 {
     float baseDamage;
 
-    protected override float GetBaseStatFromUser(Entity user)
+    protected override float GetBaseStatFromUser(CombatEntity user)
     {
-        return user.entityBaseStats.attackStat;
+        return user.entityStats.attackStat;
     }
-
-    protected override void OnCast()
-    {
-        WhileCasting();
-    }
-    protected override void WhileCasting()
-    {
-        EndCast();
-    }
-
 
     protected override void EndCast()
     {
-        DoSkill();
+        base.EndCast();
     }
-
-    public override void Cast(Entity user, List<ITargetable> target)
-    {
-        this.user = user;
-        this.target = target[0];
-        OnCast();
-    }
-
-
 
     protected override void DoSkill()
     {
-        Debug.Log($"Hit");
         baseDamage = GetBaseStatFromUser(user);
-        target.ReceiveDamage(baseDamage, DamageType.Physical);
-
+        target[0].ReceiveDamage(baseDamage, DamageType.Physical);
     }
 }

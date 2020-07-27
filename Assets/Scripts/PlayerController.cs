@@ -5,47 +5,78 @@ using UnityEngine;
 public class PlayerController : Controller
 {
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        owner = GetComponent<PlayerCharacter>();
-    }
+    public List<BaseSkill> skillsOnHotbar;
 
-    // Update is called once per frame
-    void Update()
+    protected override void StartInit()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        base.StartInit();
+
+        skillsOnHotbar = new List<BaseSkill>(16);
+        foreach (BaseSkill skill in entity.entityStats.skills)
         {
-            DoSkill(owner.entityBaseStats.skills[0]);
+            skillsOnHotbar.Add(Instantiate(skill));
         }
     }
 
-    public override void SetTarget(Entity target)
+    // Update is called once per frame
+    public override void Tick(float deltaTime)
     {
-        if(target.entityBaseStats.teamID == owner.entityBaseStats.teamID)
+        base.Tick(deltaTime);
+
+        switch (entity.currentState)
+        {
+            case CombatEntity.CurrentState.Idle:
+                if (Input.GetButtonDown("Skill 1"))
+                {
+                    CastSkill(entity.GetSkills()[0]);
+                }
+                break;
+            case CombatEntity.CurrentState.Casting:
+                break;
+            case CombatEntity.CurrentState.Stunned:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public override void SetTarget(CombatEntity target)
+    {
+        if (target.TeamID == entity.TeamID)
         {
             currentTargetAlly = target;
         }
         else
         {
             currentTargetEnemy = target;
-        }
-        Debug.Log(target);
+            CombatManager.instance.targetCircle.transform.position = target.gameObject.transform.position;
+        }   
     }
 
-    protected override List<ITargetable> FindTarget(BaseSkill skill)
+    protected override List<CombatEntity> FindTarget(BaseSkill skill)
     {
-        List<ITargetable> targets = new List<ITargetable>();
+        List<CombatEntity> targets = new List<CombatEntity>();
         switch (skill.targetType)
         {
             case BaseSkill.Target.Self:
-                targets.Add(owner);
+                targets.Add(entity);
                 break;
             case BaseSkill.Target.Enemy:
+                if (currentTargetEnemy == null)
+                {
+                    SetTarget(CombatManager.instance.EnemiesOnScreen[Random.Range(0, CombatManager.instance.EnemiesOnScreen.Count)]);
+                }
                 targets.Add(currentTargetEnemy);
                 break;
             case BaseSkill.Target.Ally:
-                targets.Add(currentTargetAlly);
+                if (currentTargetAlly == null)
+                {
+                    targets.Add(entity);
+                }
+                else
+                {
+                    targets.Add(currentTargetAlly);
+                }
                 break;
             default:
                 return null;
@@ -54,8 +85,13 @@ public class PlayerController : Controller
         return targets;
     }
 
-    protected override void DoSkill(BaseSkill skill)
+    public void DeselectEnemyTarget()
     {
-        owner.CastSkill(skill, FindTarget(skill));
+        currentTargetEnemy = null;
+    }
+
+    protected override void CastSkill(BaseSkill skill)
+    {
+        entity.CastSkill(skill, FindTarget(skill));
     }
 }

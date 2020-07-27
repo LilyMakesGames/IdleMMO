@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Map",menuName = "New Map")]
+[CreateAssetMenu(fileName = "New Map",menuName = "New Map", order = 3)]
 public class Map : ScriptableObject
 {
     enum MapType
@@ -12,5 +12,5 @@ public class Map : ScriptableObject
         Dungeon
     }
 
-    public List<EntityBaseStats> enemiesOnMap;
+    public EnemyParty[] spawnPool;
 }
